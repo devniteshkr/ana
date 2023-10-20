@@ -1,0 +1,6 @@
+HPCSAgit
+HPCSAbash
+HPCSAansible
+HPCSAterraform
+HPCSAdocker
+HPCSAkubernetes

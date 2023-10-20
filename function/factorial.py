@@ -1,18 +1,18 @@
-# num=int(input("Enter number: "))
-# result=1
-# while(num>=1):
-#     result=num*result
-#     num=num-1
-# print("factorial of ",num,"is",result)
+num=int(input("Enter number: "))
+result=1
+while(num>=1):
+    result=num*result
+    num=num-1
+print("factorial of ",num,"is",result)
 
 
-# def fact(num):
-#     result=1
-#     while(num>=1):
-#         result=num*result
-#         num=num-1
-#     print("factorial of num","is",result)
-# fact(int(input("Enter number")))
+def fact(num):
+    result=1
+    while(num>=1):
+        result=num*result
+        num=num-1
+    print("factorial of num","is",result)
+fact(int(input("Enter number")))
 
 
 def factorial(n):

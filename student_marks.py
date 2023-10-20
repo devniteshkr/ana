@@ -12,6 +12,6 @@ while True:
     else:
         print("{} g0t {} marks: ".format(name,marks))
     option=input("Do you want to find other students marks: ")
-    if option=="No":
+    if option=="No"or"no"or"NO":
         break
 print("Thanks for using application")
