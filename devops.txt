@@ -1,0 +1,282 @@
+etc/hosts	timedatectl	ssh 	selinux		firewall	
+
+
+authorized_keys permission: 600 (only the user who owns the file can access)
+
+ssh-keygen -t rsa
+enable root login in /etc/ssh/sshd_config
+ssh-copy-id root@knode1
+ssh root@knode1
+
+
+docker save web2 > nginx-image.tar
+
+docker load < nginx-image.tar
+
+
+DOCKER INSTALLATION:
+====================
+sudo dnf config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+
+sudo dnf -y install docker-ce docker-ce-cli containerd.io docker-compose-plugin
+
+sudo systemctl --now enable docker
+
+
+OR
+
+yum install -y docker
+systemctl stop podman
+yum erase -y podman
+
+https://docs.rockylinux.org/gemstones/docker/
+
+
+BASIC DOCKER CMD:
+=================
+docker ps
+docker ps -a
+docker images
+docker run IMAGE_NAME
+docker run -d httpd
+docker run -it ubuntu bash
+docker attach CONTAINER_NAME
+docker pull IMAGE_NAME
+docker rm CONTAINER_NAME
+
+docker run ubuntu sleep 10
+docker stop CONTAINER_NAME
+docker rm CONTAINER_NAME CONTA_NAME CONTA_NAME
+
+TO REMOVE AN IMAGES:
+====================
+
+docker rmi IMAGE_NAME
+
+
+To stop all the containers at once, run the command:
+====================================================
+docker stop $(docker ps -aq)
+
+
+To remove all the stopped containers at once, run the command:
+============================================================== 
+docker rm $(docker ps -aq)
+
+
+to delete all the available images:
+===================================
+docker rmi $(docker images -aq)
+
+
+CONTAINER DETAILS
+=================
+
+docker inspect CONTAINER_NAME
+
+docker logs CONTAINER_NAME
+
+
+DOCKER COMPOSE:
+===============
+cp /usr/libexec/docker/cli-plugins/docker-compose	/usr/bin/
+docker-compose -v
+ext: docker microsoft.com
+
+docker-compose up
+docker-compose up -d
+
+version: '2.0'
+services:
+  web1:
+    image: nginx
+    ports:
+      - 4500:80
+  web2:
+    image: httpd
+    ports:
+      - 7000:80
+
+
+=============
+DOCKER SWARM:
+=============
+
+ALL NODE: Static IP, /etc/hosts confic, root access yes, ssh-key, firewalld open, dockerinstalled
+	  selinux off
+
+on all nodes:
+============
+
+firewall-cmd --add-port=2377/tcp --permannent
+syetmctl reload firewalld
+firewall-cmd --list-all
+
+master:
+======
+docker swarm init --advertise-addr 192.168.155.134
+vim swarm.sh
+cat swarm.sh
+chmod +x swarm.sh
+scp swarm.sh root@192.168.155.140:/root
+
+
+node:
+=====
+./swarm.sh
+
+
+
+master:
+=======
+docker node ls
+
+
+
+mkdir ans1
+vim index.html
+
+DOCKERFILE:
+===========
+
+FROM httpd
+COPY index.html /usr/local/apache2/htdocs
+
+docker build -t web1 .
+docker image ls
+docker tag web1 devkrnitesh/webserver1:v1.0
+docker push devkrnitesh/webserver1:v1.0
+
+docker service create -p 5500:80 --name=myweb -d devkrnitesh/webserver1:v1.0
+
+or to publish on all node
+
+docker service create --publish published=8000, target=80 --name=myweb -d devkrnitesh/webserver1:v1.0
+
+docker service ls
+
+docker service ps myweb
+
+docker service scale myweb=10
+
+docker service ls
+
+docker service ps myweb
+
+docker service scale scale myweb=3
+
+docker service ps myweb
+
+curl IP:5500
+
+
+
+SWARM MAINTANANCE:
+==================
+
+firewall-cmd --permanent --add-port={2377,7946,4789}/tcp
+firewall-cmd --permanent --add-port={7946,4789}/udp
+
+firewall-cmd --reload
+
+docker node promote -h
+docker node promote node_name
+
+docker node inspect knode1 | grep -i role
+
+docker node update -h
+
+docker node update --availability drain master
+
+shutdown master host
+
+docker node promote knode1
+
+docker node demote knode1
+
+docker node demote knode1
+
+
+docker service create --publish published=7200,target=80 -d nginx
+
+docker service create --publish published=7200,target=80  --name wb1 --mode=global -d nginx
+
+
+HOW TO REMOVE CLUSTER:
+=====================
+
+docker swarm leave --force   (FIRST ON WORKER THEN MASTER)
+
+
+REDIS:
+======
+docker run --name redis -d redis:alpine
+
+
+
+=============
+TIMEDATECTL:
+=============
+
+NTP Server Disabled:
+systemctl disable --now chronyd
+timedatectl set-time '2023-12-17 12:54:33'
+
+
+
+
+
+
+
+
+========
+JENKINS:
+========
+
+docker run -p 8080:8080 -v /root/my-jenkins-data:/var/jenkins_home -u root jenkins
+
+
+yum install -y java-17-openjdk
+
+wget https://updates.jenkins.io/download/war/2.436/jenkins.war
+
+java -jar jenkins.war
+
+/root/.jenkins/secrets/initialAdminPassword      #key location
+
+
+
+yum install java-17-openjdk
+install jenkins on centos 9
+
+
+
+
+
+FETCH:
+======
+cd /code/jenkins-demo
+git pull origin main
+
+
+BUILD DOCKER IMAGE:
+===================
+cd /code/jenkins-demo
+docker build -t jenkins-app .
+scp jenkins-app.tar root@192.168.144.102:/root/
+ssh -t root@192.168.144.102	"cat /root/jenkins-app.tar | sudo docker load"
+
+
+DEPLOY IMAGE:
+=============
+
+ssh -t root@192.168.144.102  docker stop webapp
+ssh -t root@192.168.144.102 docker rm webapp
+ssh -t root@192.168.144.102 "docker run --name webapp -p 80:80 -d jenkins-app"
+
+
+SSH-TEST:
+=========
+
+ssh -t devops@192.168.144.102 sudo mkdir /dev-test
+ssh -t devops@192.168.144.102 sudo touch /dev-test/file1
