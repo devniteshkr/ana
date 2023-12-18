@@ -296,3 +296,14 @@ docker network disconnect net1 wb6
 docker network connect podman wb6
 docker network rm net1
 docker network ls
+
+
+docker run --name some-mysql -e MYSQL_ROOT_PASSWORD=my-secret-pw -d mysql:tag
+
+docker run -it --network some-network --rm mysql mysql -hsome-mysql -uexample-user -
+
+docker run -it --rm mysql mysql -hsome.mysql.host -usome-mysql-user -p
+
+docker exec -it some-mysql bash
+docker logs some-mysql
+
