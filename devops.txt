@@ -280,3 +280,19 @@ SSH-TEST:
 
 ssh -t devops@192.168.144.102 sudo mkdir /dev-test
 ssh -t devops@192.168.144.102 sudo touch /dev-test/file1
+
+
+docker network ls
+docker run --network app1
+docker inspect container name | grep 'ip'
+docker network create net1
+docker network ls
+docker run --name wb5 -p 7500:80 -d httpd
+docker inspect wb5 | grep -i restart
+docker network disconnect -h
+docker network disconnect PODMAN wb5
+docker network connect net1 wb6
+docker network disconnect net1 wb6
+docker network connect podman wb6
+docker network rm net1
+docker network ls
